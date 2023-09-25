@@ -13,7 +13,6 @@ class HomeRepository implements HomeRepositoryBase {
   @override
   Future<Either<Failure, List<String>>> getAllSymbols() async {
     final isConnected = await networkChecker.checkInternetConnectivity();
-    final result = await homeService.getAllSymbolsOffline();
     if (isConnected) {
       try {
         final result = await homeService.getAllSymbols();
