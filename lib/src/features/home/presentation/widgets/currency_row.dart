@@ -29,6 +29,7 @@ class CurrencyRow extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(15.0))),
             title: const Text('Choose a currency'),
             content: SizedBox(
+              width: double.maxFinite,
               height: 250,
               child: ListView.builder(
                   itemCount: symbols.length,

@@ -24,7 +24,10 @@ class HomeRepository implements HomeRepositoryBase {
       }
     } else {
       final result = await homeService.getAllSymbolsOffline();
-      return Success(result);
+      if (result.isNotEmpty) {
+        return Success(result);
+      }
+      return Error(NetworkFailure());
     }
   }
 

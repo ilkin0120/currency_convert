@@ -1,3 +1,4 @@
+import 'package:currency_conv/src/common/error/failures.dart';
 import 'package:currency_conv/src/common/utils/request_status.dart';
 import 'package:currency_conv/src/common/widgets/custom_icon_button.dart';
 import 'package:currency_conv/src/features/home/presentation/cubits/convert_cubit/convert_cubit.dart';
@@ -5,6 +6,8 @@ import 'package:currency_conv/src/features/home/presentation/cubits/symbols_cubi
 import 'package:currency_conv/src/features/home/presentation/widgets/currency_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../common/utils/default_snackbar.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -40,9 +43,25 @@ class _HomeState extends State<Home> {
             BlocProvider(create: (context) => SymbolsCubit()..getSymbols()),
             BlocProvider(create: (context) => ConvertCubit()),
           ],
-          child: BlocBuilder<SymbolsCubit, SymbolsState>(
+          child: BlocConsumer<SymbolsCubit, SymbolsState>(
+            listener: (context, state) {
+              final status = state.status;
+              if (status is SubmissionFailed) {
+                if (status.failure is NetworkFailure) {
+                  DefaultSnackBar().errorSnackBar(
+                      context, 'Отсутсвует подключение к интернету');
+                } else if (status.failure is ServerFailure) {
+                  DefaultSnackBar().errorSnackBar(context, 'Ошибка сервера');
+                } else if (status.failure is BadRequestFailure) {
+                  // If error's type is [BadRequestFailure] then just navigate to OtpScreen
+                  DefaultSnackBar()
+                      .errorSnackBar(context, 'Что-то пошло не так');
+                }
+              }
+            },
             builder: (context, state) {
-              return state.status is RequestSubmitting
+              return state.status is RequestSubmitting ||
+                      state.status is SubmissionFailed
                   ? const Center(
                       child: Text(
                         'Loading',
